@@ -1,0 +1,34 @@
+name: Daily Commit
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "Chandan Kalita"
+          git config user.email "ck3196686@gmail.com"
+
+      - name: Update timestamp file
+        run: |
+          echo "Last update: $(date -u)" > daily-update.txt
+
+      - name: Commit changes
+        run: |
+          git add daily-update.txt
+          git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
